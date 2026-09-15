@@ -61,6 +61,30 @@ resource "aws_ecs_task_definition" "backend" {
         {
           name  = "S3_DOCUMENTS_BUCKET"
           value = aws_s3_bucket.documents.id
+        },
+        {
+          name  = "DB_HOST"
+          value = aws_db_instance.postgres.address
+        },
+        {
+          name  = "DB_PORT"
+          value = tostring(aws_db_instance.postgres.port)
+        },
+        {
+          name  = "DB_NAME"
+          value = aws_db_instance.postgres.db_name
+        },
+        {
+          name  = "DB_USER"
+          value = aws_db_instance.postgres.username
+        }
+      ]
+
+      # Le mot de passe est récupéré dans Secrets Manager au démarrage
+      secrets = [
+        {
+          name      = "DB_PASSWORD"
+          valueFrom = "${aws_db_instance.postgres.master_user_secret[0].secret_arn}:password::"
         }
       ]
 
@@ -77,7 +101,8 @@ resource "aws_ecs_task_definition" "backend" {
   ])
 
   depends_on = [
-    aws_iam_role_policy_attachment.ecs_execution
+    aws_iam_role_policy_attachment.ecs_execution,
+    aws_iam_role_policy.ecs_database_secret
   ]
 
   tags = {
@@ -85,3 +110,4 @@ resource "aws_ecs_task_definition" "backend" {
     Environment = "production"
   }
 }
+

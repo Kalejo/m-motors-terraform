@@ -76,3 +76,27 @@ resource "aws_iam_role_policy" "ecs_documents_read" {
   policy = data.aws_iam_policy_document.ecs_documents_read.json
 }
 
+
+# Autorise ECS à récupérer le mot de passe PostgreSQL dans Secrets Manager
+data "aws_iam_policy_document" "ecs_database_secret" {
+  statement {
+    sid    = "ReadDatabaseSecret"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+
+    resources = [
+      aws_db_instance.postgres.master_user_secret[0].secret_arn
+    ]
+  }
+}
+
+# Association de l'autorisation au rôle d'exécution ECS
+resource "aws_iam_role_policy" "ecs_database_secret" {
+  name   = "${var.project_name}-ecs-database-secret"
+  role   = aws_iam_role.ecs_execution.id
+  policy = data.aws_iam_policy_document.ecs_database_secret.json
+}
+
