@@ -27,3 +27,8 @@ variable "backend_image_tag" {
   default     = "v1"
 }
 
+
+variable "ec2_key_name" {
+  description = "Nom de la paire de cles AWS utilisee pour la connexion SSH"
+  type        = string
+}
