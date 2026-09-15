@@ -15,3 +15,9 @@ variable "environment" {
   type        = string
   default     = "production"
 }
+
+variable "admin_cidr" {
+  description = "Adresse IP publique autorisee a se connecter en SSH"
+  type        = string
+}
+
