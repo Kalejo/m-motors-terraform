@@ -21,3 +21,9 @@ variable "admin_cidr" {
   type        = string
 }
 
+variable "backend_image_tag" {
+  description = "Tag de l'image Docker du backend dans ECR"
+  type        = string
+  default     = "v1"
+}
+
