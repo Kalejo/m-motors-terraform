@@ -1,0 +1,11 @@
+# Exemple uniquement : remplacer les valeurs avant un déploiement réel
+
+admin_cidr = "203.0.113.10/32"
+
+ec2_key_name = "nom-de-votre-cle-aws"
+
+alert_email = "votre-adresse@example.com"
+
+monthly_budget_limit = 100
+rds_budget_limit     = 50
+
