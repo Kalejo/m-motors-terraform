@@ -32,3 +32,24 @@ variable "ec2_key_name" {
   description = "Nom de la paire de cles AWS utilisee pour la connexion SSH"
   type        = string
 }
+
+
+variable "alert_email" {
+  description = "Adresse e-mail recevant les alertes CloudWatch"
+  type        = string
+}
+
+
+# Ajouter les deux limites budgétaires
+
+variable "monthly_budget_limit" {
+  description = "Budget mensuel maximal pour l'ensemble du compte AWS en USD"
+  type        = number
+}
+
+variable "rds_budget_limit" {
+  description = "Budget mensuel maximal pour Amazon RDS en USD"
+  type        = number
+}
+
+
