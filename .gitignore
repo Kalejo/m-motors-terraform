@@ -3,3 +3,12 @@
 *.tfstate.*
 *.tfvars
 crash.logs
+
+
+# Environnement et caches Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
