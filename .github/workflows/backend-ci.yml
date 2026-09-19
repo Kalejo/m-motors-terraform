@@ -23,7 +23,7 @@ permissions:
 jobs:
   tests-python:
     name: Tests unitaires Python
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     defaults:
       run:
@@ -50,7 +50,7 @@ jobs:
 
   construction-docker:
     name: Construction de l’image Docker
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: tests-python
 
     steps:
