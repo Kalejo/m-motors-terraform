@@ -15,7 +15,14 @@ on:
       - "backend/**"
       - ".github/workflows/backend-ci.yml"
 
+  # Le déploiement AWS reste manuel pour éviter de générer des coûts
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Publier l'image dans ECR et déployer dans ECS"
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -59,3 +66,64 @@ jobs:
 
       - name: Construction de l’image
         run: docker build -t m-motors-backend:${{ github.sha }} ./backend
+
+  deploiement-ecs:
+    name: Publication ECR et déploiement ECS
+    runs-on: ubuntu-24.04
+    needs: construction-docker
+
+    # Cette étape fonctionne uniquement après un lancement manuel avec deploy = true
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      AWS_REGION: eu-west-3
+      ECR_REPOSITORY: m-motors-backend
+      ECS_CLUSTER: m-motors-cluster
+      ECS_SERVICE: m-motors-backend-service
+      ECS_TASK_FAMILY: m-motors-backend
+      ECS_CONTAINER: m-motors-backend
+
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v7
+
+      - name: Authentification auprès d’AWS
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Connexion à ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Construction et publication de l’image
+        id: build-image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE="$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker build -t "$IMAGE" ./backend
+          docker push "$IMAGE"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Préparation de la nouvelle tâche ECS
+        id: task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition-family: ${{ env.ECS_TASK_FAMILY }}
+          container-name: ${{ env.ECS_CONTAINER }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Déploiement dans ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-definition.outputs.task-definition }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          wait-for-service-stability: true
