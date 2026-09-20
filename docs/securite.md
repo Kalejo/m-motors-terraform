@@ -33,5 +33,5 @@ La cohérence de l'infrastructure a été contrôlée avec :
 - `terraform validate` ;
 - `terraform plan`.
 
-Le plan Terraform prévoit 76 ressources à créer, sans modification ni destruction d'une infrastructure existante.
+Le plan Terraform prévoit encore 74 ressources à créer, sans modification ni suppression. Les deux ressources ECR (Elastic Container Registry, registre d’images Docker AWS) ont déjà été créées séparément pour publier l’image du backend.
 
