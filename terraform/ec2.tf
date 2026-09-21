@@ -58,11 +58,11 @@ resource "aws_instance" "development" {
     delete_on_termination = true
   }
 
-  # Installation automatique des outils de développement
+  # Installation automatique de Git, Docker et AWS CLI via cloud-init
   user_data = <<-EOF
     #!/bin/bash
     apt-get update -y
-    DEBIAN_FRONTEND=noninteractive apt-get install -y ansible git
+    DEBIAN_FRONTEND=noninteractive apt-get install -y git docker.io awscli
   EOF
 
   user_data_replace_on_change = true
