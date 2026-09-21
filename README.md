@@ -55,7 +55,11 @@ Le backend a ensuite été :
 3. publié dans ECR avec le tag `v1` ;
 4. ajouté à une pipeline GitHub Actions.
 
-La pipeline exécute automatiquement les tests Python et la construction de l’image Docker. La publication dans ECR et le déploiement dans ECS sont présents, mais restent manuels pour éviter le lancement accidentel de ressources payantes.
+La pipeline exécute automatiquement les tests Python et la construction de l’image Docker. Ces deux étapes ont été exécutées avec succès.
+
+J’ai également prévu une étape manuelle pour publier l’image dans ECR (Elastic Container Registry, registre d’images Docker AWS) et déployer le backend dans ECS (Elastic Container Service, service d’exécution de conteneurs). Cette étape est désactivée par défaut et je ne l’ai pas exécutée, afin d’éviter des frais AWS. Son fonctionnement en déploiement réel n’a donc pas été vérifié.
+
+Pour l’utiliser, il faut disposer de l’infrastructure ECS et du registre ECR, ainsi que d’un rôle IAM (Identity and Access Management, gestion des accès AWS) autorisant GitHub Actions à publier et déployer. L’identifiant de ce rôle doit être renseigné dans la variable GitHub `AWS_GITHUB_ACTIONS_ROLE_ARN`.
 
 Preuves :
 
